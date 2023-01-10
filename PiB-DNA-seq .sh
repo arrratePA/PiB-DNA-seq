@@ -11,9 +11,9 @@ ENDCOLOR="\e[0m"
     # exit when any command fails
 set -e
     # keep track of the last executed command
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG # no funciona
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG
     # echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT #no funciona
+trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 #0. Define aliases
 alias picard="java -jar /home/bioaraba/bioinfo/bioinfo_tools/picard.jar"
@@ -44,7 +44,7 @@ do
         d) dict=$(realpath ${OPTARG});;
         g) genome_path=$(realpath ${OPTARG});;
         h) humandb=$(realpath ${OPTARG});;
-        r) check_report=$(realpath ${OPTARG});;
+        r) check_report=${OPTARG};;
     esac
 done
 
