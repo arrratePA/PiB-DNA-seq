@@ -172,8 +172,8 @@ for i in `cat $samples`; do
 #6. HaplotypeCaller
     echo -e `date +[%D-%R]` "\t${BOLDGREEN}Starting HaplotypeCaller without realigned in ${i} sample${ENDCOLOR}" | tee -a $workingpath/timeElapseReport.log    
     gatk HaplotypeCaller \
+        -I ${i}.RG.sorted.mkdup.bqsr.bam \    
         -R $genome_path \
-        -I ${i}.RG.sorted.mkdup.bqsr.bam \
         -L $intervals \
         -ip 150 \
         -O ${i}.g.vcf.gz \
@@ -273,12 +273,12 @@ echo -e `date +[%D-%R]` "\t${BOLDGREEN}Calculating coverage statistics${ENDCOLOR
 cd $bam_files
 for i in `cat $samples`; do
     gatk DepthOfCoverage \
-        -R $genome_path \
-        -O $coverage_statistics/${i} \
         -I ${i}.RG.sorted.mkdup.bam \
-        -L $intervals \
+	-R $genome_path \
+	-L $intervals \             
         -ip 50 \
         -gene-list $gene_list \
+	-O $coverage_statistics/${i} \
         --summary-coverage-threshold 20 \
         --summary-coverage-threshold 50 \
         --summary-coverage-threshold 100
@@ -291,10 +291,7 @@ echo -e `date +[%D-%R]` "\t${BOLDGREEN}Removing not needed files${ENDCOLOR}" | t
 cd $vcf_files
 rm -r *_F1.log
 rm -r *_SNVs.myanno.avinput
-rm -r *.vcf.idx
-rm -r *.vcf.gz.tbi
 rm -r database
-rm -r cohort.*
 cd $bam_files
 rm -r *.sorted.bam 
 cd $quality_files
