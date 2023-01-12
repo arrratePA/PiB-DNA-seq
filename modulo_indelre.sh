@@ -55,18 +55,17 @@ for i in `cat $samples`; do
 # Indelrealigner
     echo -e `date +[%D-%R]` "\t${BOLDGREEN}IndelRealigner in ${i} sample${ENDCOLOR}" | tee -a $workingpath/timeElapseReport.log
     gatk3 -T RealignerTargetCreator \
-        -ip 150 \
+        -I $workingpath/bam_files/${i}.RG.sorted.mkdup.bam \
         -R $genome_path \
         -L $intervals \
-        -I $workingpath/bam_files/${i}.RG.sorted.mkdup.bam \
+        -ip 150 \
         -o ${i}.RG.sorted.mkdup.bam.realignertargetcreator.intervals
 
-    gatk3 \
-        -T IndelRealigner \
-        -ip 150 \
+    gatk3 -T IndelRealigner \
+        -I $workingpath/bam_files/${i}.RG.sorted.mkdup.bam \
         -R $genome_path \
         -targetIntervals ${i}.RG.sorted.mkdup.bam.realignertargetcreator.intervals \
-        -I $workingpath/bam_files/${i}.RG.sorted.mkdup.bam \
+        -ip 150 \
         -o ${i}.RG.sorted.mkdup.indelrealigned.bam
 
 #5. Base Quality Recalibration (BQSR) indelrealigned bams
@@ -91,8 +90,8 @@ for i in `cat $samples`; do
 #6. HaplotypeCaller
     echo -e `date +[%D-%R]` "\t${BOLDGREEN}Doing HaplotypeCaller in realigned ${i} sample${ENDCOLOR}" | tee -a $workingpath/timeElapseReport.log    
     gatk HaplotypeCaller \
-        -R $genome_path \
         -I ${i}.RG.sorted.mkdup.indelrealigned.bqsr.bam \
+        -R $genome_path \        
         -L $intervals \
         -ip 150 \
         -O ${i}.indelrealigned.g.vcf.gz \
@@ -187,10 +186,7 @@ echo -e `date +[%D-%R]` "\t${BOLDGREEN}Removing not needed files${ENDCOLOR}" | t
 cd $vcf_files_indelre
 rm -r *_F1.log
 rm -r *_SNVs.myanno.avinput
-rm -r *.vcf.idx
-rm -r *.vcf.gz.tbi
 rm -r database
-rm -r cohort.*
 cd $bam_files_indelre
 rm -r *.RG.sorted.mkdup.indelrealigned.bam
 rm -r *.RG.sorted.mkdup.indelrealigned.bai
