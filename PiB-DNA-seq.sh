@@ -11,9 +11,9 @@ ENDCOLOR="\e[0m"
     # exit when any command fails
 set -e
     # keep track of the last executed command
-trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG # no funciona
+trap 'last_command=$current_command; current_command=$BASH_COMMAND' DEBUG 
     # echo an error message before exiting
-trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT #no funciona
+trap 'echo "\"${last_command}\" command filed with exit code $?."' EXIT
 
 #0. Define aliases
 alias picard="java -jar /home/bioaraba/bioinfo/bioinfo_tools/picard.jar"
@@ -29,11 +29,11 @@ genome_path="/home/bioaraba/bioinfo/bioinfo_tools/genome_references/hg38/GCA_000
 dbsnp138="/home/bioaraba/bioinfo/bioinfo_tools/genome_references/hg38/hg38/resources_broad_hg38_v0_Homo_sapiens_assembly38.dbsnp138.vcf"
 hg38_indels="/home/bioaraba/bioinfo/bioinfo_tools/genome_references/hg38/hg38/resources_broad_hg38_v0_Homo_sapiens_assembly38.known_indels.vcf.gz"
 gs_indels="/home/bioaraba/bioinfo/bioinfo_tools/genome_references/hg38/hg38/resources_broad_hg38_v0_Mills_and_1000G_gold_standard.indels.hg38.vcf.gz"
-check_report=false #no funciona, si pongo true no lo escribe en la pregunta como true pero luego si me pregunta 
+check_report=false 
 indelre_do=true
 pwd_sh=$(realpath $(dirname $0))
 
-#0. Get variables defined by input
+#0. Parse variables defined by input
 while getopts w:a:b:i:d:g:h:r: flag
 do
     case "${flag}" in
@@ -44,7 +44,7 @@ do
         d) dict=$(realpath ${OPTARG});;
         g) genome_path=$(realpath ${OPTARG});;
         h) humandb=$(realpath ${OPTARG});;
-        r) check_report=$(realpath ${OPTARG});;
+        r) check_report=${OPTARG};;
     esac
 done
 
@@ -106,7 +106,7 @@ for i in `cat $samples`; do
 
 done
 
-#1.C. Create a merge quality report with fastqc analysis of all samples 
+#1.C. Create a merged quality report with fastqc analysis of all samples 
 echo -e `date +[%D-%R]` "\t${BOLDGREEN}Creating quality check merged report${ENDCOLOR}" | tee -a $workingpath/timeElapseReport.log
 multiqc $quality_files -o $quality_files -i $(basename $workingpath)
 echo -e `date +[%D-%R]` "\t${BOLDGREEN}Quality merged report created${ENDCOLOR}" | tee -a $workingpath/timeElapseReport.log
@@ -127,7 +127,7 @@ for i in `cat $samples`; do
     gunzip ${i}.2_trim.fq.gz
 
 #3.2 Bwa mem = the algorithm works by seeding alignments with maximal exact matches (MEMs) and then extending seeds with the affine-gap Smith-Waterman algorithm (SW).
-    bwa mem -t 4 -MP -Y $genome_path ${i}.1_trim.fq ${i}.2_trim.fq > ${i}.sam
+    bwa mem -t 4 -MP -Y -R '@RG\tID:${i}\tSM:${i}\tLB:Twist\tPL:ILLUMINA' $genome_path ${i}.1_trim.fq ${i}.2_trim.fq > ${i}.sam
     echo -e `date +[%D-%R]` "\t${BOLDGREEN}Alignment of ${i} sample finished${ENDCOLOR}" | tee -a $workingpath/timeElapseReport.log
     #Create bam file and sort + index
     samtools view -bS ${i}.sam > ${i}.bam
@@ -253,7 +253,7 @@ for i in `cat $samples`; do
     echo -e `date +[%D-%R]` "\t${BOLDGREEN}Variants table of ${i} sample created${ENDCOLOR}" | tee -a $workingpath/timeElapseReport.log
 done
 
-#Create file with results for all samples
+#Create a table with results for all samples
 ls *_variants_table.txt > samples_SNVs_Library.txt
 vim -c "%s/_variants_table.txt//g|wq" samples_SNVs_Library.txt
 for i in $(cat samples_SNVs_Library.txt); do
