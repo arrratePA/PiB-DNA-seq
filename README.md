@@ -1,5 +1,4 @@
 # PiB-DNA-seq
-DNA-seq pipeline
 Background: Inactivating PTH/PTHrP signaling disorders are heterogeneous group of rare diseases in which several genes and genetic mechanisms 
 (mosaicism, copy number variations or structural variants) are involved. In this context, the iPPSD-seq Next Generation DNA sequencing panel was 
 designed for the study of this of patients with suspicion of this type of disorders. For the analysis of the panel sequencing data, a GATK Best Practices workflow 
